@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
+
+#define MAX_FILENAME_LENGTH 100
+#define DIRECTORY_NAME "single_level_directory"
+
+void create_directory() {
+    if (mkdir(DIRECTORY_NAME, 0777) == -1) {
+        perror("Error creating directory");
+    } else {
+        printf("Directory '%s' created successfully.\n", DIRECTORY_NAME);
+    }
+}
+
+void list_files() {
+    DIR *dir;
+    struct dirent *entry;
+
+    dir = opendir(DIRECTORY_NAME);
+    if (dir == NULL) {
+        perror("Error opening directory");
+        return;
+    }
+
+    printf("Files in '%s':\n", DIRECTORY_NAME);
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            printf("%s\n", entry->d_name);
+        }
+    }
+
+    closedir(dir);
+}
+
+void create_file() {
+    char filename[MAX_FILENAME_LENGTH];
+    printf("Enter the name of the file to create: ");
+    scanf("%s", filename);
+
+    char filepath[MAX_FILENAME_LENGTH + strlen(DIRECTORY_NAME) + 2];
+    snprintf(filepath, sizeof(filepath), "%s/%s", DIRECTORY_NAME, filename);
+
+    FILE *file = fopen(filepath, "w");
+    if (file == NULL) {
+        perror("Error creating file");
+    } else {
+        printf("File '%s' created successfully.\n", filename);
+        fclose(file);
+    }
+}
+
+void delete_file() {
+    char filename[MAX_FILENAME_LENGTH];
+    printf("Enter the name of the file to delete: ");
+    scanf("%s", filename);
+
+    char filepath[MAX_FILENAME_LENGTH + strlen(DIRECTORY_NAME) + 2];
+    snprintf(filepath, sizeof(filepath), "%s/%s", DIRECTORY_NAME, filename);
+
+    if (remove(filepath) == 0) {
+        printf("File '%s' deleted successfully.\n", filename);
+    } else {
+        perror("Error deleting file");
+    }
+}
+
+int main() {
+    int choice;
+
+    // Create directory if not already exists
+    if (opendir(DIRECTORY_NAME) == NULL) {
+        create_directory();
+    }
+
+    while (1) {
+        printf("\nFile Organization System\n");
+        printf("1. List Files\n");
+        printf("2. Create File\n");
+        printf("3. Delete File\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                list_files();
+                break;
+            case 2:
+                create_file();
+                break;
+            case 3:
+                delete_file();
+                break;
+            case 4:
+                printf("Exiting...\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
