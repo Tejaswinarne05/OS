@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+
+int main() {
+    int fd;                // File descriptor
+    char buffer[100];      // Buffer to store data
+    ssize_t bytesRead;     // Number of bytes read/written
+
+    // 1. Create a new file or open an existing one
+    fd = open("example.txt", O_CREAT | O_WRONLY, 0644);
+    if (fd < 0) {
+        perror("File creation/opening failed");
+        exit(1);
+    }
+    printf("File created/opened successfully (fd = %d)\n", fd);
+
+    // 2. Write to the file
+    const char *data = "Hello, this is a demo of UNIX file management system calls.\n";
+    if (write(fd, data, strlen(data)) < 0) {
+        perror("File write failed");
+        close(fd);
+        exit(1);
+    }
+    printf("Data written to the file successfully.\n");
+
+    // 3. Close the file
+    close(fd);
+
+    // 4. Open the file in read-only mode
+    fd = open("example.txt", O_RDONLY);
+    if (fd < 0) {
+        perror("File opening for reading failed");
+        exit(1);
+    }
+    printf("File opened for reading (fd = %d)\n", fd);
+
+    // 5. Read from the file
+    bytesRead = read(fd, buffer, sizeof(buffer) - 1);
+    if (bytesRead < 0) {
+        perror("File read failed");
+        close(fd);
+        exit(1);
+    }
+    buffer[bytesRead] = '\0';  // Null-terminate the string
+    printf("Data read from the file:\n%s", buffer);
+
+    // 6. Close the file
+    close(fd);
+    printf("\nFile closed successfully.\n");
+
+    return 0;
+}
