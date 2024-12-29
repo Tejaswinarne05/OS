@@ -1,0 +1,174 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <dirent.h>
+
+#define MAX_FILENAME_LENGTH 100
+#define MAX_CATEGORY_LENGTH 50
+
+void create_directory(char *path) {
+    if (mkdir(path, 0777) == -1) {
+        perror("Error creating directory");
+    } else {
+        printf("Directory '%s' created successfully.\n", path);
+    }
+}
+
+void create_category() {
+    char category_name[MAX_CATEGORY_LENGTH];
+    printf("Enter the category name: ");
+    scanf("%s", category_name);
+
+    char category_path[MAX_CATEGORY_LENGTH + 20];
+    snprintf(category_path, sizeof(category_path), "%s", category_name);
+
+    // Create the category directory
+    create_directory(category_path);
+}
+
+void list_categories() {
+    DIR *dir = opendir(".");
+    struct dirent *entry;
+
+    if (dir == NULL) {
+        perror("Error opening current directory");
+        return;
+    }
+
+    printf("Categories:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        // Display directories (categories) only
+        if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+            printf("%s\n", entry->d_name);
+        }
+    }
+
+    closedir(dir);
+}
+
+void create_file_in_category() {
+    char category_name[MAX_CATEGORY_LENGTH], filename[MAX_FILENAME_LENGTH];
+    printf("Enter the category name: ");
+    scanf("%s", category_name);
+    
+    printf("Enter the name of the file to create: ");
+    scanf("%s", filename);
+
+    char category_path[MAX_CATEGORY_LENGTH + 20];
+    snprintf(category_path, sizeof(category_path), "%s", category_name);
+
+    // Check if the category exists
+    if (opendir(category_path) == NULL) {
+        printf("Category '%s' does not exist!\n", category_name);
+        return;
+    }
+
+    // Create the file in the specified category
+    char file_path[MAX_CATEGORY_LENGTH + 20 + MAX_FILENAME_LENGTH];
+    snprintf(file_path, sizeof(file_path), "%s/%s", category_path, filename);
+
+    FILE *file = fopen(file_path, "w");
+    if (file == NULL) {
+        perror("Error creating file");
+    } else {
+        printf("File '%s' created successfully in category '%s'.\n", filename, category_name);
+        fclose(file);
+    }
+}
+
+void list_files_in_category() {
+    char category_name[MAX_CATEGORY_LENGTH];
+    printf("Enter the category name: ");
+    scanf("%s", category_name);
+
+    char category_path[MAX_CATEGORY_LENGTH + 20];
+    snprintf(category_path, sizeof(category_path), "%s", category_name);
+
+    DIR *dir = opendir(category_path);
+    struct dirent *entry;
+
+    if (dir == NULL) {
+        printf("Category '%s' does not exist!\n", category_name);
+        return;
+    }
+
+    printf("Files in category '%s':\n", category_name);
+    while ((entry = readdir(dir)) != NULL) {
+        // Display files only (not subdirectories)
+        if (entry->d_type == DT_REG) {
+            printf("%s\n", entry->d_name);
+        }
+    }
+
+    closedir(dir);
+}
+
+void delete_file_from_category() {
+    char category_name[MAX_CATEGORY_LENGTH], filename[MAX_FILENAME_LENGTH];
+    printf("Enter the category name: ");
+    scanf("%s", category_name);
+
+    printf("Enter the name of the file to delete: ");
+    scanf("%s", filename);
+
+    char category_path[MAX_CATEGORY_LENGTH + 20];
+    snprintf(category_path, sizeof(category_path), "%s", category_name);
+
+    // Check if the category exists
+    if (opendir(category_path) == NULL) {
+        printf("Category '%s' does not exist!\n", category_name);
+        return;
+    }
+
+    char file_path[MAX_CATEGORY_LENGTH + 20 + MAX_FILENAME_LENGTH];
+    snprintf(file_path, sizeof(file_path), "%s/%s", category_path, filename);
+
+    // Delete the file
+    if (remove(file_path) == 0) {
+        printf("File '%s' deleted successfully from category '%s'.\n", filename, category_name);
+    } else {
+        perror("Error deleting file");
+    }
+}
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\nFile Organization System (Two-Level Directory)\n");
+        printf("1. Create Category\n");
+        printf("2. List Categories\n");
+        printf("3. Create File in Category\n");
+        printf("4. List Files in Category\n");
+        printf("5. Delete File from Category\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                create_category();
+                break;
+            case 2:
+                list_categories();
+                break;
+            case 3:
+                create_file_in_category();
+                break;
+            case 4:
+                list_files_in_category();
+                break;
+            case 5:
+                delete_file_from_category();
+                break;
+            case 6:
+                printf("Exiting...\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
