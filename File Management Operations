@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *file;
+    char filename[] = "example.txt";
+    char buffer[256];
+
+    
+    file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("Error creating file");
+        return 1;
+    }
+    fprintf(file, "Hello, this is a file management example in C.\n");
+    fprintf(file, "You can read, write, and delete files.\n");
+    fclose(file);
+    printf("File '%s' created and written successfully.\n", filename);
+
+    
+    file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("Error opening file");
+        return 1;
+    }
+    printf("\nReading contents of '%s':\n", filename);
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        printf("%s", buffer);
+    }
+    fclose(file);
+
+    
+    file = fopen(filename, "a");
+    if (file == NULL) {
+        perror("Error opening file for appending");
+        return 1;
+    }
+    fprintf(file, "This line was appended to the file.\n");
+    fclose(file);
+    printf("\nAppended content to '%s'.\n", filename);
+
+    
+    if (remove(filename) == 0) {
+        printf("\nFile '%s' deleted successfully.\n", filename);
+    } else {
+        perror("Error deleting file");
+    }
+
+    return 0;
+}
