@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+
+void *threadFunction(void *arg) {
+    int id = *((int *)arg);
+    printf("Thread %d: Running...\n", id);
+    sleep(2); 
+    printf("Thread %d: Exiting...\n", id);
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t thread1, thread2;
+    int threadId1 = 1, threadId2 = 2;
+
+    if (pthread_create(&thread1, NULL, threadFunction, &threadId1) != 0) {
+        perror("Failed to create thread1");
+        return 1;
+    }
+    if (pthread_create(&thread2, NULL, threadFunction, &threadId2) != 0) {
+        perror("Failed to create thread2");
+        return 1;
+    }
+
+    if (pthread_equal(thread1, thread2)) {
+        printf("Thread1 and Thread2 are equal (same).\n");
+    } else {
+        printf("Thread1 and Thread2 are not equal (different).\n");
+    }
+
+    if (pthread_join(thread1, NULL) != 0) {
+        perror("Failed to join thread1");
+        return 1;
+    }
+    printf("Thread1 has finished.\n");
+
+    if (pthread_join(thread2, NULL) != 0) {
+        perror("Failed to join thread2");
+        return 1;
+    }
+    printf("Thread2 has finished.\n");
+
+    printf("Main thread exiting...\n");
+    pthread_exit(NULL); 
+}
