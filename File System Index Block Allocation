@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void displayFile(int *indexBlock, int n) {
+    printf("File blocks: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", indexBlock[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of blocks in the file: ");
+    scanf("%d", &n);
+
+    if (n <= 0) {
+        printf("No blocks to allocate.\n");
+        return 0;
+    }
+
+    int *indexBlock = (int *)malloc(n * sizeof(int));
+    if (indexBlock == NULL) {
+        printf("Memory allocation failed.\n");
+        return 1;
+    }
+
+    printf("Enter the block numbers: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &indexBlock[i]);
+    }
+
+    displayFile(indexBlock, n);
+
+    free(indexBlock);
+
+    return 0;
+}
