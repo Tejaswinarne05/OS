@@ -1,0 +1,79 @@
+#include <stdio.h>
+
+#define MAX_FRAMES 10
+#define MAX_PAGES 20
+int findOptimalPage(int pages[], int frames[], int numPages, int numFrames, int currentIndex) {
+    int i, j, farthest = currentIndex, farthestIndex = -1;
+    for (i = 0; i < numFrames; i++) {
+        int found = 0;
+        for (j = currentIndex + 1; j < numPages; j++) {
+            if (frames[i] == pages[j]) {
+                found = 1;
+                if (j > farthest) {
+                    farthest = j;
+                    farthestIndex = i;
+                }
+                break;
+            }
+        }
+        if (!found) {
+            return i;
+        }
+    }
+    if (farthestIndex == -1) {
+        return 0;
+    }
+    return farthestIndex;
+}
+
+int optimalPaging(int pages[], int numPages, int numFrames) {
+    int frames[MAX_FRAMES] = {-1};  // To store pages in frames
+    int pageFaults = 0;
+    int i, j, pageFound;
+
+    for (i = 0; i < numPages; i++) {
+        pageFound = 0;
+        for (j = 0; j < numFrames; j++) {
+            if (frames[j] == pages[i]) {
+                pageFound = 1;
+                break;
+            }
+        }
+
+        if (!pageFound) {
+            pageFaults++;
+            for (j = 0; j < numFrames; j++) {
+                if (frames[j] == -1) {
+                    frames[j] = pages[i];
+                    break;
+                }
+            }
+
+            if (j == numFrames) {
+                int replaceIndex = findOptimalPage(pages, frames, numPages, numFrames, i);
+                frames[replaceIndex] = pages[i];
+            }
+        }
+    }
+    return pageFaults;
+}
+
+int main() {
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 3}; 
+    int numPages = sizeof(pages) / sizeof(pages[0]);
+    int numFrames;
+
+    printf("Enter number of frames: ");
+    scanf("%d", &numFrames);
+
+    if (numFrames > MAX_FRAMES) {
+        printf("Number of frames exceeds the maximum allowed frames\n");
+        return -1;
+    }
+
+    int pageFaults = optimalPaging(pages, numPages, numFrames);
+
+    printf("Total number of page faults: %d\n", pageFaults);
+
+    return 0;
+}
