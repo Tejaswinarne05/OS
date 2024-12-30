@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void cscan(int arr[], int size, int head, int disk_size) {
+    int seek_sequence[size + 2];
+    int distance, total_head_movement = 0, index = 0;
+
+    for (int i = 0; i < size; i++) {
+        for (int j = i + 1; j < size; j++) {
+            if (arr[i] > arr[j]) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+
+    for (int i = 0; i < size; i++) {
+        if (arr[i] >= head) {
+            seek_sequence[index++] = arr[i];
+            distance = arr[i] - head;
+            total_head_movement += distance;
+            head = arr[i];
+        }
+    }
+    total_head_movement += (disk_size - head);
+    head = 0;
+    seek_sequence[index++] = 0;
+
+    for (int i = 0; i < size; i++) {
+        if (arr[i] < head) {
+            seek_sequence[index++] = arr[i];
+            distance = arr[i] - head;
+            total_head_movement += abs(distance);
+            head = arr[i];
+        }
+    }
+
+    printf("Total head movement: %d\n", total_head_movement);
+    printf("Seek Sequence: ");
+    for (int i = 0; i < index; i++) {
+        printf("%d ", seek_sequence[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int requests[] = {176, 79, 34, 60, 92, 11, 41, 114};
+    int size = sizeof(requests) / sizeof(requests[0]);
+    int head = 50;
+    int disk_size = 200;
+
+    cscan(requests, size, head, disk_size);
+    return 0;
+}
+ C-SCAN disk scheduling
