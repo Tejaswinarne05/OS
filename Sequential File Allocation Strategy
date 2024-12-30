@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void displayFile(int *fileRecords, int n) {
+    printf("File records: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", fileRecords[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of records in the file: ");
+    scanf("%d", &n);
+
+    if (n <= 0) {
+        printf("No records to allocate.\n");
+        return 0;
+    }
+
+    int *fileRecords = (int *)malloc(n * sizeof(int));
+    if (fileRecords == NULL) {
+        printf("Memory allocation failed.\n");
+        return 1;
+    }
+
+    printf("Enter the record values: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &fileRecords[i]);
+    }
+
+    displayFile(fileRecords, n);
+
+    free(fileRecords);
+
+    return 0;
+}
