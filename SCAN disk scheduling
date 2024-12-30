@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+}
+
+void SCAN(int req[], int n, int head, int size, int dir) {
+    int left[n], right[n], l = 0, r = 0, seek = 0, pos = head;
+
+    for (int i = 0; i < n; i++)
+        (req[i] < head ? left[l++] : right[r++]);
+
+    sort(left, l); sort(right, r);
+
+    printf("\nSeek sequence: ");
+    if (dir) {
+        for (int i = 0; i < r; i++) { printf("%d ", right[i]); seek += abs(pos - right[i]); pos = right[i]; }
+        if (pos < size - 1) { seek += abs(pos - (size - 1)); pos = size - 1; }
+        for (int i = l - 1; i >= 0; i--) { printf("%d ", left[i]); seek += abs(pos - left[i]); pos = left[i]; }
+    } else {
+        for (int i = l - 1; i >= 0; i--) { printf("%d ", left[i]); seek += abs(pos - left[i]); pos = left[i]; }
+        if (pos > 0) { seek += abs(pos); pos = 0; }
+        for (int i = 0; i < r; i++) { printf("%d ", right[i]); seek += abs(pos - right[i]); pos = right[i]; }
+    }
+    printf("\nTotal seek time: %d\n", seek);
+}
+
+int main() {
+    int n, head, size, dir;
+    printf("Enter number of requests: "); scanf("%d", &n);
+    int req[n];
+    printf("Enter request sequence: ");
+    for (int i = 0; i < n; i++) scanf("%d", &req[i]);
+    printf("Enter initial head position: "); scanf("%d", &head);
+    printf("Enter disk size: "); scanf("%d", &size);
+    printf("Enter direction (1 for high, 0 for low): "); scanf("%d", &dir);
+    SCAN(req, n, head, size, dir);
+    return 0;
+}
